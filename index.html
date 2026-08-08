@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="color-scheme" content="light dark">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Countdown">
+    
+    <!-- AJOUT iOS : Balise meta dynamique pour la barre de statut Safari / PWA -->
+    <meta name="theme-color" id="theme-color-meta" content="#E6E6E6">
+
+    <link rel="apple-touch-icon" href="countdownlogo.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="countdownlogo.png">
+    <title>Countdown</title>
+</head>
+<style>
+
+    @import url('https://fonts.googleapis.com/css2?family=Boldonse&display=swap');
+
+     /* ==========================================================================
+           1. VARIABLES CSS (THÈMES THÈME CLAIR ET SOMBRE)
+           ========================================================================== */
+        
+        /* ☀️ Thème Clair (par défaut) */
+        :root {
+            color-scheme: light;
+
+            --background-body: white;
+            --color-h1: black;
+            --color-date: black;
+            --color-date-hover: rgb(77, 77, 77);
+            --color-time: black;
+            --border-date: rgb(217, 217, 217);
+            --border-time: rgb(217, 217, 217);
+            --color-time-hover: rgb(77, 77, 77);
+            --background-contener-flex: white;
+            --background-input: white;
+            --color-input: black;
+            --color-casereponse: orange;
+            --color-casereponse-valeur: orange;
+            --color-casereponse-label: gray;
+        }
+
+        /* 🌙 Thème Sombre (activé par la classe .dark-mode ou .theme-dark sur <body>) */
+        body.dark-mode,
+        body.theme-dark {
+            color-scheme: dark;
+            --background-body: black;
+            --color-h1: white;
+            --color-date: white;
+            --border-date: gray;
+            --border-date-focus: rgba(161, 212, 232, 0.25);
+            --color-date-hover: rgb(77, 77, 77);
+            --color-time: white;
+            --border-time: gray;
+            --border-date-focus: rgba(161, 212, 232, 0.25);
+            --color-time-hover: rgb(77, 77, 77);
+            --background-contener-flex: black;
+            --background-input: #1f1f1f;
+            --color-input: white;
+            --color-casereponse: orange;
+            --color-casereponse-valeur: orange;
+            --color-casereponse-label: gray;
+        }
+
+
+    .boldonse-regular {
+  font-family: "Boldonse", system-ui;
+  font-weight: 400;
+  font-style: normal;
+}
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background-color: var(--background-body);
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    h1 {
+        color: var(--color-h1);
+        margin-bottom: 20px;
+        font-size: clamp(1.5rem, 4vw, 2.5rem);
+        line-height: 1.2;
+        max-width: 700px;
+    }
+    #date,
+    #time {
+        color: var(--color-input);
+        background-color: var(--background-input);
+        -webkit-text-fill-color: var(--color-input);
+        border-radius: 4px;
+        height: 50px;
+        width: 100%;
+        max-width: 400px;
+        font-size: large;
+        margin: 8px auto;
+        box-sizing: border-box;
+        border: none;
+        text-align: center;
+        display: block;
+        padding: 0 10px;
+        line-height: 50px;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+    #date::-webkit-datetime-edit,
+    #time::-webkit-datetime-edit,
+    #date::-webkit-datetime-edit-text,
+    #date::-webkit-datetime-edit-month-field,
+    #date::-webkit-datetime-edit-day-field,
+    #date::-webkit-datetime-edit-year-field,
+    #time::-webkit-datetime-edit-hour-field,
+    #time::-webkit-datetime-edit-minute-field,
+    #time::-webkit-datetime-edit-ampm-field {
+        text-align: center;
+    }
+    #date:focus,
+    #time:focus {
+        border: none;
+        outline: none;
+    }
+    #date:hover,
+    #time:hover {
+        color: var(--color-date-hover);
+        border: none;
+    }
+        .contener-flex {
+        border-radius: 10px;
+        width: 100%; /* Modifié : 100% au lieu de 60% pour s'adapter à l'écran mobile */
+        max-width: 400px;
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        flex-direction: column;
+        padding-bottom: 10px;
+        gap: 8px;
+        box-sizing: border-box;
+        
+        /* Les propriétés overflow-x et -webkit-overflow-scrolling ont été supprimées */
+    }
+
+    .result {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        margin-top: 20px;
+        flex-wrap: nowrap;
+        justify-content: center;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 10px;
+        box-sizing: border-box;
+    }
+
+    .casereponse {
+        flex: 1 1 0;
+        min-width: 56px;
+        max-width: 96px;
+        height: 88px;
+        margin: 10px 4px;
+        border-radius: 10px;
+        color: var(--color-casereponse);
+        font-weight: 900;
+        font-size: medium;
+        font-family: 'Boldonse';
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .casereponse .valeur {
+        font-size: 20px;
+        color: var(--color-casereponse-valeur);
+    }
+
+    .casereponse .label {
+        font-size: 10px;
+        color: var(--color-casereponse-label);
+        text-transform: lowercase;
+    }
+
+    #buttonTheme {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        border: none;
+        background: transparent;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 8px;
+    }
+
+    @media (max-width: 520px) {
+        body {
+            padding: 16px;
+        }
+
+        .casereponse {
+            min-width: 48px;
+            max-width: 84px;
+            height: 82px;
+            margin: 8px 4px;
+        }
+
+        .result {
+            gap: 6px;
+        }
+
+        #buttonTheme {
+            top: 12px;
+            right: 12px;
+            font-size: 22px;
+        }
+    }
+</style>
+<body>
+    <button id="buttonTheme" aria-label="Changer de thème">🌙</button>
+    <h1>Quand se déroulera votre évènement ?</h1>
+<div class="contener-flex">
+    <input id="date" type="date">
+    <input id="time" type="time">
+</div>
+<div class="result">
+    <div id="jours" class="casereponse"><span class="valeur">00</span><span class="label">jours</span></div>
+    <div id="heures" class="casereponse"><span class="valeur">00</span><span class="label">heures</span></div>
+    <div id="minutes" class="casereponse"><span class="valeur">00</span><span class="label">minutes</span></div>
+    <div id="secondes" class="casereponse"><span class="valeur">00</span><span class="label">secondes</span></div>
+</div>
+
+<script>
+    const dateInput = document.getElementById('date');
+    const timeInput = document.getElementById('time');
+
+    const jours = document.getElementById('jours');
+    const heures = document.getElementById('heures');
+    const minutes = document.getElementById('minutes');
+    const secondes = document.getElementById('secondes');
+    const buttonTheme = document.getElementById('buttonTheme');
+
+    function applyTheme(theme) {
+        document.body.classList.toggle('theme-dark', theme === 'dark');
+        document.body.classList.toggle('dark-mode', theme === 'dark');
+        buttonTheme.textContent = theme === 'dark' ? '☀️' : '🌙';
+        localStorage.setItem('countdownTheme', theme);
+    }
+
+    buttonTheme.addEventListener('click', () => {
+        const currentTheme = document.body.classList.contains('theme-dark') ? 'dark' : 'light';
+        const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        applyTheme(nextTheme);
+    });
+
+    function mettreAJourDate() {
+        const dateVal = dateInput.value;
+        const timeVal = timeInput.value;
+
+        if (dateVal) {
+            localStorage.setItem('countdownDate', dateVal);
+        }
+
+        if (timeVal) {
+            localStorage.setItem('countdownTime', timeVal);
+        }
+
+        if (!dateVal || !timeVal) {
+            jours.querySelector('.valeur').textContent = "00";
+            heures.querySelector('.valeur').textContent = "00";
+            minutes.querySelector('.valeur').textContent = "00";
+            secondes.querySelector('.valeur').textContent = "00";
+            return;
+        }
+
+        const dateTimeString = `${dateVal}T${timeVal}`;
+        const fullDate = new Date(dateTimeString);
+        const now = new Date();
+        const diff = fullDate - now;
+
+        if (diff <= 0) {
+            jours.querySelector('.valeur').textContent = "00";
+            heures.querySelector('.valeur').textContent = "00";
+            minutes.querySelector('.valeur').textContent = "00";
+            secondes.querySelector('.valeur').textContent = "00";
+            return;
+        }
+
+        const sec = Math.floor((diff / 1000) % 60);
+        const min = Math.floor((diff / (1000 * 60)) % 60);
+        const hr = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const day = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+        jours.querySelector('.valeur').textContent = day;
+        heures.querySelector('.valeur').textContent = hr;
+        minutes.querySelector('.valeur').textContent = min;
+        secondes.querySelector('.valeur').textContent = sec;
+    }
+
+    const savedDate = localStorage.getItem('countdownDate');
+    const savedTime = localStorage.getItem('countdownTime');
+    const savedTheme = localStorage.getItem('countdownTheme');
+
+    if (savedDate) {
+        dateInput.value = savedDate;
+    }
+
+    if (savedTime) {
+        timeInput.value = savedTime;
+    }
+
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    } else {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        applyTheme(prefersDark ? 'dark' : 'light');
+    }
+
+    dateInput.addEventListener('change', mettreAJourDate);
+    timeInput.addEventListener('change', mettreAJourDate);
+    mettreAJourDate();
+    setInterval(mettreAJourDate, 1000);
+</script>
+
+</html>
